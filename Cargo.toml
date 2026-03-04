@@ -1,0 +1,35 @@
+[package]
+name = "Handiva"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+directories = "6.0.0"
+eframe = "0.33.3"
+egui = "0.33.3"
+enigo = "0.6.1"
+global-hotkey = "0.7.0"
+image = "0.25.9"
+rdev = "0.5.3"
+serde = { version = "1.0.228", features = ["derive"] }
+toml = "0.9.11"
+tracing = "0.1.44"
+tracing-appender = "0.2.4"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "registry"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_System_Threading",
+] }
+
+[profile.release]
+opt-level = "z" 
+lto = "fat"
+codegen-units = 1
+strip = true
+debug = false
+split-debuginfo = "off"
+incremental = false
