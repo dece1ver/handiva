@@ -1,6 +1,6 @@
 use crate::app::{App, hotkeys::validate_hotkey};
-use egui::{Color32, Context, CornerRadius, Frame, Slider, Stroke, Ui};
-use tracing::{debug, error, info};
+use egui::{Color32, Context, CornerRadius, Frame, Stroke, Ui};
+use tracing::{error, info};
 
 pub(crate) fn draw(app: &mut App, ui: &mut Ui, ctx: &Context) {
     ui.heading("Настройки");
@@ -9,44 +9,28 @@ pub(crate) fn draw(app: &mut App, ui: &mut Ui, ctx: &Context) {
 
     // Группа: Общие настройки
     Frame::group(ui.style())
-            .stroke(Stroke::new(1.0, Color32::from_gray(60)))
-            .corner_radius(CornerRadius::same(5))
-            .inner_margin(10.0)
-            .show(ui, |ui| {
-                ui.label(egui::RichText::new("Общие").strong().size(14.0));
-                ui.add_space(5.0);
-                ui.horizontal(|ui| {
-                    let old_freq = app.config.ui_update_frequency;
-                    let slider_response = ui.add(
-                        Slider::new(&mut app.config.ui_update_frequency, 10..=1000)
-                            .text("Частота обновления UI"),
-                    ).on_hover_text("Частота запросов на перерисовку. Приложение может принять решение о перерисовке раньше, например, если какой-то другой код вызвал этот метод с меньшим временем ожидания или если произошли новые события.");
-                    if slider_response.changed() && old_freq != app.config.ui_update_frequency {
-                        debug!("Частота обновления UI изменена: {} -> {}", old_freq, app.config.ui_update_frequency);
-                        if let Err(e) = app.config.save() {
-                            error!("Не удалось сохранить конфигурацию: {}", e);
-                            app.status = format!("Ошибка сохранения: {}", e);
-                        } else {
-                            app.status = format!("Частота обновления: {} мс", app.config.ui_update_frequency);
-                        }
-                    }
-                });
-                
-                
-let old_aot = app.config.always_on_top;
-let checkbox_response = ui.checkbox(&mut app.config.always_on_top, "Поверх всех окон");
-if checkbox_response.changed() && old_aot != app.config.always_on_top{
-    ctx.send_viewport_cmd(egui::ViewportCommand::WindowLevel(
-        if app.config.always_on_top {
-            egui::WindowLevel::AlwaysOnTop
-        } else {
-            egui::WindowLevel::Normal
-        }
-    ));
-    if let Err(e) = app.config.save() {
-        error!("Не удалось сохранить конфигурацию: {}", e);
-    }
-}});
+        .stroke(Stroke::new(1.0, Color32::from_gray(60)))
+        .corner_radius(CornerRadius::same(5))
+        .inner_margin(10.0)
+        .show(ui, |ui| {
+            ui.set_min_width(ui.available_width());
+            ui.label(egui::RichText::new("Общие").strong().size(14.0));
+            ui.add_space(5.0);
+            let old_aot = app.config.always_on_top;
+            let checkbox_response = ui.checkbox(&mut app.config.always_on_top, "Поверх всех окон");
+            if checkbox_response.changed() && old_aot != app.config.always_on_top {
+                ctx.send_viewport_cmd(egui::ViewportCommand::WindowLevel(
+                    if app.config.always_on_top {
+                        egui::WindowLevel::AlwaysOnTop
+                    } else {
+                        egui::WindowLevel::Normal
+                    },
+                ));
+                if let Err(e) = app.config.save() {
+                    error!("Не удалось сохранить конфигурацию: {}", e);
+                }
+            }
+        });
 
     ui.add_space(10.0);
 

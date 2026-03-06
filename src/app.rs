@@ -1,6 +1,3 @@
-use std::time::Duration;
-
-use egui::TopBottomPanel;
 use enigo::{Enigo, Mouse, Settings};
 use global_hotkey::{GlobalHotKeyEvent, HotKeyState};
 use tracing::{debug, error, info, warn};
@@ -43,18 +40,25 @@ impl App {
             e
         })?;
 
+        _cc.egui_ctx
+            .send_viewport_cmd(egui::ViewportCommand::WindowLevel(
+                if config.always_on_top {
+                    egui::WindowLevel::AlwaysOnTop
+                } else {
+                    egui::WindowLevel::Normal
+                },
+            ));
+
         let hotkeys =
             HotKeys::new(&config.hotkeys.set_position, &config.hotkeys.toggle).map_err(|e| {
                 error!("Не удалось инициализировать горячие клавиши: {}", e);
                 e
             })?;
-
+        let interval_input = config.default_interval.to_string();
         let enigo = Enigo::new(&Settings::default()).map_err(|e| {
             error!("Не удалось инициализировать Enigo: {}", e);
             anyhow::anyhow!("Ошибка инициализации Enigo: {}", e)
         })?;
-
-        let interval_input = config.default_interval.to_string();
 
         let mut clicker = Clicker::default();
         clicker.set_interval(config.default_interval);
@@ -119,23 +123,21 @@ impl eframe::App for App {
             }
         }
 
-        self.top_panel(ctx);
+        // self.top_panel(ctx);
         self.side_menu(ctx);
         self.status_bar(ctx);
         self.central_content(ctx);
-
-        ctx.request_repaint_after(Duration::from_millis(self.config.ui_update_frequency));
     }
 }
 
 impl App {
-    fn top_panel(&mut self, ctx: &egui::Context) {
-        TopBottomPanel::top("top").show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                ui.label("Top panel");
-            });
-        });
-    }
+    // fn top_panel(&mut self, ctx: &egui::Context) {
+    //     TopBottomPanel::top("top").show(ctx, |ui| {
+    //         ui.horizontal(|ui| {
+    //             ui.label("Top panel");
+    //         });
+    //     });
+    // }
 
     fn side_menu(&mut self, ctx: &egui::Context) {
         egui::SidePanel::left("menu")

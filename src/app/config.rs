@@ -7,7 +7,6 @@ use tracing::{debug, error, info};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct Config {
     pub(crate) always_on_top: bool,
-    pub(crate) ui_update_frequency: u64,
     #[serde(default = "default_interval")]
     pub(crate) default_interval: u64,
     #[serde(default)]
@@ -49,7 +48,6 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             always_on_top: false,
-            ui_update_frequency: 100,
             default_interval: default_interval(),
             hotkeys: HotKeyConfig::default(),
             config_path: None,

@@ -16,8 +16,8 @@ fn main() -> Result<()> {
     info!("Запуск приложения Handiva");
 
     let viewport = ViewportBuilder::default()
-        .with_inner_size([500.0, 320.0])
-        .with_min_inner_size([500.0, 320.0])
+        .with_inner_size([500.0, 274.0])
+        .with_min_inner_size([500.0, 274.0])
         .with_icon(load_icon());
 
     let options = eframe::NativeOptions {
