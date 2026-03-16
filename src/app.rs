@@ -1,3 +1,5 @@
+use std::{collections::HashSet, time::Duration};
+
 use enigo::{Enigo, Mouse, Settings};
 use global_hotkey::{GlobalHotKeyEvent, HotKeyState};
 use tracing::{debug, error, info, warn};
@@ -6,6 +8,7 @@ use crate::app::{
     clicker::Clicker,
     config::Config,
     hotkeys::{HotKeyEvent, HotKeys},
+    icon_packer::IcoImage,
     key_monitor::KeyMonitor,
 };
 
@@ -14,6 +17,7 @@ use anyhow::Result;
 mod clicker;
 mod config;
 mod hotkeys;
+mod icon_packer;
 mod key_monitor;
 mod tabs;
 mod utils;
@@ -22,6 +26,8 @@ pub(crate) struct App {
     config: Config,
     clicker: Clicker,
     active_tab: Tab,
+    ico_images: Vec<IcoImage>,
+    ico_extra_sizes: HashSet<u32>,
     key_monitor: KeyMonitor,
     status: String,
     enigo: Enigo,
@@ -72,6 +78,8 @@ impl App {
             config,
             clicker,
             active_tab: Tab::Clicker,
+            ico_images: Vec::new(),
+            ico_extra_sizes: HashSet::new(),
             key_monitor: KeyMonitor::default(),
             status: "Готов к работе".to_string(),
             enigo,
@@ -127,6 +135,8 @@ impl eframe::App for App {
         self.side_menu(ctx);
         self.status_bar(ctx);
         self.central_content(ctx);
+
+        ctx.request_repaint_after(Duration::from_millis(50));
     }
 }
 
@@ -194,7 +204,7 @@ impl App {
         egui::CentralPanel::default().show(ctx, |ui| match self.active_tab {
             Tab::Clicker => tabs::clicker::draw(self, ui),
             Tab::KeyMonitor => tabs::key_monitor::draw(self, ui),
-            Tab::IconPacker => tabs::icon_packer::draw(self, ui),
+            Tab::IconPacker => tabs::icon_packer::draw(self, ui, ctx),
             Tab::Settings => tabs::settings::draw(self, ui, ctx),
             Tab::About => tabs::about::draw(self, ui),
         });

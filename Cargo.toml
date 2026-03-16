@@ -8,10 +8,13 @@ anyhow = "1.0.100"
 directories = "6.0.0"
 eframe = "0.33.3"
 egui = "0.33.3"
+egui_extras = { version = "0.33.3", features = ["image"] }
 enigo = "0.6.1"
 global-hotkey = "0.7.0"
+ico = "0.5.0"
 image = "0.25.9"
 rdev = "0.5.3"
+rfd = "0.17.2"
 serde = { version = "1.0.228", features = ["derive"] }
 toml = "0.9.11"
 tracing = "0.1.44"
